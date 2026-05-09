@@ -22,6 +22,22 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
+      - name: Create dummy keystore
+        run: |
+          keytool -genkeypair -v \
+            -keystore ${{ github.workspace }}/release.jks \
+            -alias tui-alias \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -storepass password \
+            -keypass password \
+            -dname "CN=CI, OU=CI, O=CI, L=CI, S=CI, C=US"
+          echo "storeFile=release.jks" >> local.properties
+          echo "storePassword=password" >> local.properties
+          echo "keyAlias=tui-alias" >> local.properties
+          echo "keyPassword=password" >> local.properties
+
       - name: Build Debug APK
         run: ./gradlew assembleFdroidDebug --no-daemon 2>&1 | tail -150
 
